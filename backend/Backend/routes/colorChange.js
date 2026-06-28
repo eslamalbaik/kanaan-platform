@@ -42,9 +42,13 @@ async function uploadBase64ToTensor(base64Data) {
   const { resourceId, putUrl } = initRes.data;
   if (!resourceId || !putUrl) throw new Error("Upload init failed");
 
-  // الخطوة 2: رفع الصورة
+  // الخطوة 2: رفع الصورة مع الـ headers المطلوبة
+  const putHeaders = { "Content-Type": "application/octet-stream" };
+  if (initRes.data?.headers?.["X-Oss-Callback"]) {
+    putHeaders["X-Oss-Callback"] = initRes.data.headers["X-Oss-Callback"];
+  }
   await axios.put(putUrl, buffer, {
-    headers: { "Content-Type": "application/octet-stream" },
+    headers: putHeaders,
     timeout: 30000,
     maxBodyLength: Infinity,
     maxContentLength: Infinity,
