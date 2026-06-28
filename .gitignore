@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables
+.env
+**/.env
+*.env.local
+*.env.production
+
+# Build outputs
+frontend/build/
+
+# Python
+__pycache__/
+*.pyc
+image-engine/venv/
+image-engine/mask_cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend deploy archive
+backend/backend-deploy.tar.gz
