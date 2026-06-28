@@ -471,6 +471,18 @@ export default function ProductDetails() {
           productId={product._id}
           imageUrl={activeImage || product.images?.[0]}
           onClose={() => setShowColorCustomizer(false)}
+          onApprove={async () => {
+            await addToCart({
+              _id: product._id,
+              name: product.name,
+              price: product.price,
+              images: product.images,
+              quantity: quantity || 1,
+              selectedAttributes,
+            });
+            setShowColorCustomizer(false);
+            navigate('/checkout');
+          }}
         />
       )}
     </div>

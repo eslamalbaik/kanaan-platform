@@ -29,6 +29,7 @@ import CouponManagement from './components/pages/AdminPages/CouponManagement/Cou
 import AdminLogin from './components/pages/AdminPages/AdminLogin/AdminLogin';
 import CheckoutPage from './components/pages/CheckoutPage/CheckoutPage';
 import CustomizePage from './components/pages/CustomizePage/CustomizePage';
+import AIAssistantPage from './components/pages/AIAssistantPage/AIAssistantPage';
 import { useAuth } from './context/AuthContext';
 
 import { Outlet, Navigate } from 'react-router-dom';
@@ -63,6 +64,7 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product/:productId" element={<ProductDetails />} />
+        <Route path="/c" element={<AIAssistantPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/cart" element={<CartPage />} />

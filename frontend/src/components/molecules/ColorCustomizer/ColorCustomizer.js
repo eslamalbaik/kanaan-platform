@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Palette, RotateCcw, Download, Loader2, X } from 'lucide-react';
+import { Palette, RotateCcw, Download, Loader2, X, ShoppingCart } from 'lucide-react';
 import API from '../../../api/api';
 
 const PRESET_COLORS = [
@@ -17,7 +17,7 @@ const PRESET_COLORS = [
   { label: 'رصاصي', hex: '#9ca3af' },
 ];
 
-export default function ColorCustomizer({ productId, imageUrl, onClose }) {
+export default function ColorCustomizer({ productId, imageUrl, onClose, onApprove }) {
   const [selectedColor, setSelectedColor] = useState(null);
   const [customColor, setCustomColor] = useState('#1a1a1a');
   const [previewSrc, setPreviewSrc] = useState(null);
@@ -158,14 +158,34 @@ export default function ColorCustomizer({ productId, imageUrl, onClose }) {
                 style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
                   padding: '8px 0', borderRadius: 10,
-                  border: '1.5px solid #2a6c2d',
-                  background: (previewSrc && !loading) ? '#2a6c2d' : '#e5e7eb',
+                  border: '1.5px solid #6b7280',
+                  background: '#fff',
                   cursor: (previewSrc && !loading) ? 'pointer' : 'default',
-                  fontSize: 12, color: (previewSrc && !loading) ? '#fff' : '#999',
+                  fontSize: 12, color: (previewSrc && !loading) ? '#555' : '#999',
+                  opacity: (previewSrc && !loading) ? 1 : 0.4,
                 }}>
                 <Download size={13} /> تحميل
               </button>
             </div>
+
+            {/* زر اعتمد التصميم */}
+            {onApprove && previewSrc && !loading && (
+              <button
+                onClick={() => onApprove(previewSrc, selectedColor)}
+                style={{
+                  width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  padding: '12px 0', borderRadius: 12,
+                  background: 'linear-gradient(135deg, #b8943f, #d4a843)',
+                  border: 'none', cursor: 'pointer',
+                  fontSize: 14, fontWeight: 800, color: '#fff',
+                  boxShadow: '0 4px 15px rgba(184,148,63,0.4)',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <ShoppingCart size={16} />
+                اعتمد التصميم وأكمل الشراء
+              </button>
+            )}
           </div>
 
           {/* Color Picker Panel */}
