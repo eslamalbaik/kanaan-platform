@@ -1,0 +1,27 @@
+{
+  "short_name": "كنعان",
+  "name": "كنعان | منصة المنتجات الفلسطينية الأصيلة",
+  "description": "منصة فلسطينية تجمع أجود المنتجات التراثية والحرف اليدوية",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/logo.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2a6c2d",
+  "background_color": "#fdfcf9",
+  "orientation": "portrait",
+  "categories": ["shopping", "lifestyle"]
+}

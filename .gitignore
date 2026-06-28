@@ -9,7 +9,7 @@ node_modules/
 *.env.production
 
 # Build outputs
-frontend/build/
+# frontend/build/
 
 # Python
 __pycache__/
