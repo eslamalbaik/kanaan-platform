@@ -58,8 +58,8 @@ async function uploadBase64ToTensor(base64Data) {
 }
 
 async function createColorJob(resourceId, colorHex, colorName) {
-  const positive = `product photo, same garment, same embroidery patterns, same stitching, same folds, same composition, same background, change fabric color to ${colorName} (${colorHex}), professional product photography`;
-  const negative = `different garment, shape change, new design, blur, low quality, watermark, person, mannequin, distortion`;
+  const positive = `${colorName} colored traditional thobe, ${colorName} fabric garment, ${colorName} dress, same embroidery details, same gold stitching patterns, same garment shape, same folds and draping, flat lay product photography, white background, high quality`;
+  const negative = `original color, different color, wrong color, color unchanged, shape change, extra garment, blur, low quality, watermark, person, mannequin`;
 
   const body = {
     request_id: crypto.randomUUID(),
@@ -71,16 +71,16 @@ async function createColorJob(resourceId, colorHex, colorName) {
       {
         type: "DIFFUSION",
         diffusion: {
-          width: 512, height: 512,
+          width: 768, height: 768,
           prompts: [{ text: positive }],
           negativePrompts: [{ text: negative }],
           sd_model: SD_MODEL,
           sdVae: "Automatic",
           sampler: "DPM++ 2M Karras",
-          steps: 30,
-          cfg_scale: 7,
-          clip_skip: 2,
-          denoising_strength: 0.35,
+          steps: 35,
+          cfg_scale: 9,
+          clip_skip: 1,
+          denoising_strength: 0.65,
         },
       },
     ],
