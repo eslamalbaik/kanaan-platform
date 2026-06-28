@@ -71,6 +71,9 @@ app.use("/v1/admin/dashboard", adminDashboardRoutes);
 const adminNotificationRoutes = require("./routes/admin/notifications.js");
 app.use("/v1/admin/notifications", adminNotificationRoutes);
 
+const colorChangeRoutes = require("./routes/colorChange.js");
+app.use("/v1/color-change", colorChangeRoutes);
+
 const notFound = require("./middleware/notFound.js");
 const errorHandler = require("./middleware/errorHandler.js");
 

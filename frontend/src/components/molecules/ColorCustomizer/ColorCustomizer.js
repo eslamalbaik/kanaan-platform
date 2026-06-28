@@ -1,7 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Palette, RotateCcw, Download, Loader2, X } from 'lucide-react';
-
-const IMAGE_ENGINE_URL = process.env.REACT_APP_IMAGE_ENGINE_URL || 'http://31.97.196.73/image-engine';
+import API from '../../../api/api';
 
 const PRESET_COLORS = [
   { label: 'أسود', hex: '#1a1a1a' },
@@ -24,58 +23,29 @@ export default function ColorCustomizer({ productId, imageUrl, onClose }) {
   const [previewSrc, setPreviewSrc] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [maskReady, setMaskReady] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
 
   const abortRef = useRef(null);
 
-  // Pre-compute mask when component mounts (run once)
-  const initMask = useCallback(async () => {
-    if (maskReady) return;
-    try {
-      const imgRes = await fetch(imageUrl);
-      const blob = await imgRes.blob();
-      const fd = new FormData();
-      fd.append('image', blob, 'product.png');
-      if (productId) fd.append('product_id', productId);
-
-      await fetch(`${IMAGE_ENGINE_URL}/mask`, { method: 'POST', body: fd });
-      setMaskReady(true);
-    } catch {
-      // Mask will be computed on first preview call
-    }
-  }, [imageUrl, productId, maskReady]);
-
-  React.useEffect(() => { initMask(); }, [initMask]);
-
   const applyColor = useCallback(async (hex) => {
-    if (abortRef.current) abortRef.current.abort();
-    abortRef.current = new AbortController();
-
     setLoading(true);
     setError('');
+    setStatusMsg('جاري رفع الصورة...');
 
     try {
-      const imgRes = await fetch(imageUrl);
-      const blob = await imgRes.blob();
-
-      const fd = new FormData();
-      fd.append('image', blob, 'product.png');
-      fd.append('color', hex);
-      if (productId) fd.append('product_id', productId);
-
-      const res = await fetch(`${IMAGE_ENGINE_URL}/preview/color`, {
-        method: 'POST',
-        body: fd,
-        signal: abortRef.current.signal,
+      setStatusMsg('جاري معالجة اللون بالذكاء الاصطناعي... (30-60 ثانية)');
+      const res = await API.post('/color-change', {
+        imageUrl,
+        color: hex,
+        productId,
       });
 
-      if (!res.ok) throw new Error('فشل تغيير اللون');
-
-      const resultBlob = await res.blob();
-      const url = URL.createObjectURL(resultBlob);
-      setPreviewSrc(prev => { if (prev) URL.revokeObjectURL(prev); return url; });
+      if (!res.data?.success) throw new Error(res.data?.message || 'فشل');
+      setPreviewSrc(res.data.data.resultUrl);
+      setStatusMsg('');
     } catch (e) {
-      if (e.name !== 'AbortError') setError('تعذر الاتصال بمحرك الصور');
+      setError(e.response?.data?.message || e.message || 'حدث خطأ');
+      setStatusMsg('');
     } finally {
       setLoading(false);
     }
@@ -95,6 +65,7 @@ export default function ColorCustomizer({ productId, imageUrl, onClose }) {
     setPreviewSrc(null);
     setSelectedColor(null);
     setError('');
+    setStatusMsg('');
   };
 
   const handleDownload = () => {
@@ -102,6 +73,7 @@ export default function ColorCustomizer({ productId, imageUrl, onClose }) {
     const a = document.createElement('a');
     a.href = previewSrc;
     a.download = `kanaan-product-${selectedColor?.replace('#', '')}.png`;
+    a.target = '_blank';
     a.click();
   };
 
@@ -137,52 +109,59 @@ export default function ColorCustomizer({ productId, imageUrl, onClose }) {
 
           {/* Preview Panel */}
           <div style={{ padding: 20, borderLeft: '1px solid #f0f0f0', background: '#fafafa', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '1', background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{
+              position: 'relative', width: '100%', aspectRatio: '1',
+              background: '#fff', borderRadius: 14, border: '1px solid #e5e7eb',
+              overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>
               <img
                 src={displaySrc}
                 alt="معاينة المنتج"
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', transition: 'opacity 0.2s' }}
+                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
               />
               {loading && (
                 <div style={{
                   position: 'absolute', inset: 0,
-                  background: 'rgba(255,255,255,0.7)',
+                  background: 'rgba(255,255,255,0.85)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  flexDirection: 'column', gap: 8,
+                  flexDirection: 'column', gap: 10, padding: 16, textAlign: 'center',
                 }}>
-                  <Loader2 size={28} color="#2a6c2d" style={{ animation: 'spin 1s linear infinite' }} />
-                  <span style={{ fontSize: 12, color: '#2a6c2d', fontWeight: 600 }}>جاري تطبيق اللون...</span>
+                  <Loader2 size={32} color="#2a6c2d" style={{ animation: 'spin 1s linear infinite' }} />
+                  <span style={{ fontSize: 12, color: '#2a6c2d', fontWeight: 700 }}>{statusMsg}</span>
+                  <span style={{ fontSize: 11, color: '#888' }}>الذكاء الاصطناعي يعالج الصورة مع الحفاظ على التطريز والطيات</span>
                 </div>
               )}
             </div>
 
-            {selectedColor && (
+            {selectedColor && !loading && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#555' }}>
                 <div style={{ width: 16, height: 16, borderRadius: 4, background: selectedColor, border: '1px solid #ddd' }} />
                 <span>{selectedColor}</span>
               </div>
             )}
 
-            {error && <p style={{ fontSize: 12, color: '#dc2626', textAlign: 'center' }}>{error}</p>}
+            {error && (
+              <p style={{ fontSize: 12, color: '#dc2626', textAlign: 'center', margin: 0 }}>{error}</p>
+            )}
 
-            {/* Action buttons */}
             <div style={{ display: 'flex', gap: 8, width: '100%' }}>
-              <button onClick={handleReset} disabled={!previewSrc}
+              <button onClick={handleReset} disabled={!previewSrc || loading}
                 style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
                   padding: '8px 0', borderRadius: 10, border: '1.5px solid #e5e7eb',
                   background: '#fff', cursor: 'pointer', fontSize: 12, color: '#555',
-                  opacity: previewSrc ? 1 : 0.4,
+                  opacity: (previewSrc && !loading) ? 1 : 0.4,
                 }}>
                 <RotateCcw size={13} /> إعادة
               </button>
-              <button onClick={handleDownload} disabled={!previewSrc}
+              <button onClick={handleDownload} disabled={!previewSrc || loading}
                 style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                  padding: '8px 0', borderRadius: 10, border: '1.5px solid #2a6c2d',
-                  background: previewSrc ? '#2a6c2d' : '#e5e7eb',
-                  cursor: previewSrc ? 'pointer' : 'default',
-                  fontSize: 12, color: previewSrc ? '#fff' : '#999',
+                  padding: '8px 0', borderRadius: 10,
+                  border: '1.5px solid #2a6c2d',
+                  background: (previewSrc && !loading) ? '#2a6c2d' : '#e5e7eb',
+                  cursor: (previewSrc && !loading) ? 'pointer' : 'default',
+                  fontSize: 12, color: (previewSrc && !loading) ? '#fff' : '#999',
                 }}>
                 <Download size={13} /> تحميل
               </button>
@@ -196,19 +175,21 @@ export default function ColorCustomizer({ productId, imageUrl, onClose }) {
               {PRESET_COLORS.map(({ label, hex }) => (
                 <button
                   key={hex}
-                  onClick={() => handlePresetClick(hex)}
+                  onClick={() => !loading && handlePresetClick(hex)}
                   title={label}
+                  disabled={loading}
                   style={{
                     width: '100%', aspectRatio: '1', borderRadius: 10,
                     background: hex,
                     border: selectedColor === hex ? '3px solid #2a6c2d' : '2px solid #e5e7eb',
-                    cursor: 'pointer',
+                    cursor: loading ? 'not-allowed' : 'pointer',
                     boxShadow: selectedColor === hex ? '0 0 0 2px #fff, 0 0 0 4px #2a6c2d' : 'none',
                     transition: 'all 0.15s',
+                    opacity: loading ? 0.6 : 1,
                     position: 'relative',
                   }}
                 >
-                  {selectedColor === hex && (
+                  {selectedColor === hex && !loading && (
                     <span style={{
                       position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
                       color: ['#f5f5f5', '#c8b89a', '#b8943f'].includes(hex) ? '#333' : '#fff',
@@ -225,6 +206,7 @@ export default function ColorCustomizer({ productId, imageUrl, onClose }) {
                 type="color"
                 value={customColor}
                 onChange={e => setCustomColor(e.target.value)}
+                disabled={loading}
                 style={{ width: 44, height: 44, borderRadius: 10, border: '2px solid #e5e7eb', cursor: 'pointer', padding: 2 }}
               />
               <input
@@ -242,23 +224,21 @@ export default function ColorCustomizer({ productId, imageUrl, onClose }) {
                   padding: '10px 14px', borderRadius: 10,
                   background: '#2a6c2d', color: '#fff', border: 'none',
                   fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                  opacity: loading || customColor.length !== 7 ? 0.5 : 1,
+                  opacity: (loading || customColor.length !== 7) ? 0.5 : 1,
                 }}>
                 تطبيق
               </button>
             </div>
 
-            <div style={{ background: '#f0fdf4', borderRadius: 12, padding: 12, fontSize: 11, color: '#2a6c2d', lineHeight: 1.7 }}>
-              <strong>⚡ كيف يعمل؟</strong><br/>
-              يتم تغيير اللون باستخدام فضاء اللون LAB مع الحفاظ على الإضاءة والظلال والطيات والخياطة بشكل كامل.
+            <div style={{ background: '#f0fdf4', borderRadius: 12, padding: 12, fontSize: 11, color: '#2a6c2d', lineHeight: 1.8 }}>
+              <strong>🤖 كيف يعمل؟</strong><br />
+              الذكاء الاصطناعي يغيّر لون القماش مع الحفاظ الكامل على التطريز والطيات والخياطة والأزرار. قد يستغرق 30-60 ثانية.
             </div>
           </div>
         </div>
       </div>
 
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
