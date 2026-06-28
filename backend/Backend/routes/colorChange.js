@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const tensorClient = require("../services/TensorApiClient");
-const authMiddleware = require("../middleware/auth");
 
 const COLOR_NAMES_AR = {
   '#1a1a1a': 'أسود', '#f5f5f5': 'أبيض', '#c8b89a': 'بيج', '#6b7280': 'رمادي',
@@ -15,7 +14,7 @@ function hexToColorName(hex) {
 
 // POST /v1/color-change
 // body: { imageUrl, color (hex), productId }
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", async (req, res) => {
   const { imageUrl, color, productId } = req.body;
 
   if (!imageUrl || !color) {
