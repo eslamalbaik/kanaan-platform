@@ -1,0 +1,15 @@
+.trust-badges-section {
+  background: linear-gradient(180deg, #eee6da 0%, #ffffff 100%);
+  padding: 100px 0;
+  margin: 90px 0;
+}
+
+.trust-badges-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+  direction: rtl;
+}

@@ -1,0 +1,20 @@
+.social-icons {
+  display: flex;
+  gap: 16px;
+}
+
+.icon-btn {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  padding: 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.icon-btn:hover {
+  background: #8fc45a;
+}

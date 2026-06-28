@@ -1,0 +1,56 @@
+.btn-atom {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 28px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  transition: 0.3s;
+  cursor: pointer;
+  border: 0 !important;
+  outline: none !important;
+  background: none;
+  font-family: inherit;
+}
+
+.btn-atom.primary {
+  background: #2a6c2a;
+  color: #fff;
+  border: none !important; 
+}
+
+.btn-atom.secondary {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+.btn-atom.success {
+  background: #e8f5e0;
+  color: #2d6a2d;
+  border: none !important;
+}
+
+.btn-atom:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.btn-atom.outline {
+  background-color: #f4efe6; 
+  color: #444;
+  border: 1px solid transparent !important; 
+}
+
+.btn-atom.outline:hover {
+  background-color: #e8e2d8; 
+  transform: translateY(-2px);
+}
+
+.btn-atom:focus, .btn-atom:active {
+  outline: none !important;
+  box-shadow: none !important;
+}

@@ -1,0 +1,99 @@
+.auth-input-wrapper {
+  @apply relative w-full mb-1; 
+}
+
+.auth-input {
+  @apply w-full
+  h-[70px]          
+  rounded-[50px]   
+  border
+  border-white
+  bg-white/10
+  backdrop-blur-sm
+  text-right
+  pl-14 
+  pr-8 
+  text-white
+  text-lg
+  outline-none
+  transition-all
+  duration-300
+  placeholder:text-gray-200
+  placeholder:text-lg; 
+  direction: rtl;
+}
+
+.auth-input:focus {
+  @apply border-green-400
+  bg-white/20;
+}
+
+.eye-btn {
+  @apply absolute
+  left-5
+  top-1/2          
+  -translate-y-1/2
+  text-white
+  text-xl
+  cursor-pointer
+  bg-transparent
+  border-none
+  outline-none
+  z-10; 
+}
+
+.auth-input.input-error {
+  @apply border-red-500;
+}
+
+.error-message {
+  @apply text-red-500
+  text-xs
+  mt-1
+  mr-4 
+  text-right
+  block;
+  
+  min-height: 1.25rem; 
+}
+
+@media (max-width: 1024px) and (min-width: 641px) {
+  .auth-input {
+    height: 58px;                  
+    border-radius: 50px;           
+    font-size: 16px;              
+    @apply pr-6 pl-12;              
+  }
+  
+  .auth-input::placeholder {
+    font-size: 16px !important;     
+  }
+  
+  .eye-btn {
+    text-size-adjust: 18px;         
+    left: 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-input {
+    height: 50px;                   
+    border-radius: 50px;           
+    font-size: 14px;               
+    @apply pr-5 pl-10;
+  }
+  
+  .auth-input::placeholder {
+    font-size: 14px !important;    
+  }
+  
+  .eye-btn {
+    @apply text-lg;                 
+    left: 3.5px;
+  }
+  
+  .error-message {
+    font-size: 11px;
+    @apply mr-3;
+  }
+}

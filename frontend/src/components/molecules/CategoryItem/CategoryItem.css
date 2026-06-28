@@ -1,0 +1,37 @@
+.category-item {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.6s ease;
+}
+
+.category-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.category-item__label {
+  font-weight: 700;
+  font-size: 18px;
+  color: #1b3d1b;
+  transition: color 0.3s ease;
+}
+
+/* Hover Effects */
+.category-item:hover .category-circle {
+  transform: scale(1.08);
+  box-shadow: 0 20px 50px rgba(45, 106, 45, 0.2);
+  border-color: #8b5e34;
+}
+
+.category-item:hover .category-circle__image {
+  transform: scale(1.12);
+}
+
+.category-item:hover .category-item__label {
+  color: #8b5e34;
+}

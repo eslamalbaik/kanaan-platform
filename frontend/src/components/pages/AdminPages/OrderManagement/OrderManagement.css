@@ -1,0 +1,193 @@
+
+.order-management-container {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-6 w-full items-start p-0 bg-transparent min-h-screen overflow-hidden;
+  max-width: 100vw;
+}
+.order-details-card {
+  @apply bg-white border border-[#eae6dc] rounded-2xl p-5 shadow-sm lg:col-span-1;
+}
+.orders-list-section {
+  @apply bg-white border border-[#eae6dc] rounded-2xl p-5 md:p-6 shadow-sm lg:col-span-2 overflow-hidden;
+}
+.card-header-with-icon {
+  @apply flex items-center gap-2 border-b border-[#eae6dc]/60 pb-3 mb-4;
+}
+
+.card-header-with-icon h2 {
+  @apply text-base font-bold text-[#1a3a1a];
+}
+.order-details-content {
+  @apply flex flex-col gap-4;
+}
+.order-id-badge {
+  @apply flex justify-between items-center bg-[#fdfcf9] px-3 py-2 rounded-xl border border-[#eae6dc] text-xs text-gray-600;
+}
+
+.info-block-section {
+  @apply border-b border-gray-100 pb-3;
+}
+
+.section-subtitle-with-icon {
+  @apply flex items-center gap-1.5 text-xs font-bold text-[#8B5A2B] mb-2;
+}
+
+.order-items-mini-list {
+  @apply flex flex-col gap-2 max-h-[160px] overflow-y-auto pr-1 my-2;
+}
+
+.mini-item-row {
+  @apply flex justify-between items-center bg-gray-50 p-2 rounded-lg text-xs border border-gray-100;
+}
+
+.mini-item-info {
+  @apply flex flex-col gap-0.5;
+}
+
+.mini-item-name {
+  @apply font-medium text-gray-800;
+}
+
+.mini-item-qty {
+  @apply text-gray-400 text-[10px];
+}
+
+.mini-item-price {
+  @apply font-semibold font-mono text-gray-600;
+}
+
+.total-amount-row {
+  @apply flex justify-between items-center pt-2 px-1 text-xs font-bold text-gray-700;
+}
+
+.form-group {
+  @apply flex flex-col gap-1.5;
+}
+
+.form-group label {
+  @apply text-xs font-semibold text-gray-600;
+}
+
+.order-select-input {
+  @apply bg-[#fdfcf9] border border-[#eae6dc] rounded-xl px-3 py-2 text-sm outline-none transition-all focus:border-[#2a6c2a] focus:bg-white w-full cursor-pointer;
+}
+
+.section-title-wrapper {
+  @apply flex items-center justify-between border-b border-[#eae6dc]/60 pb-4 mb-4;
+}
+
+.title-flex {
+  @apply flex items-center gap-2 text-[#1a3a1a] text-lg font-bold;
+}
+
+.count-badge {
+  @apply bg-[#fdfcf9] border border-[#eae6dc] text-gray-600 text-xs px-2.5 py-1 rounded-full font-medium;
+}
+
+.table-toolbar {
+  @apply flex flex-col sm:flex-row gap-3 items-center justify-between mb-4 w-full;
+}
+
+.search-wrapper {
+  @apply relative w-full sm:flex-1 max-w-md flex items-center;
+}
+
+.search-wrapper svg {
+  @apply absolute right-3 text-gray-400 pointer-events-none;
+}
+
+.search-input {
+  @apply bg-[#fdfcf9] border border-[#eae6dc] rounded-xl pr-10 pl-4 py-2 text-sm outline-none transition-all focus:border-[#2a6c2a] focus:bg-white w-full;
+}
+
+.filter-select {
+  @apply bg-[#fdfcf9] border border-[#eae6dc] rounded-xl px-3 py-2 text-sm outline-none cursor-pointer w-full sm:w-[160px] text-gray-600;
+}
+
+.orders-table-wrapper {
+  @apply w-full overflow-x-auto border border-gray-100 rounded-xl;
+}
+
+.orders-table-wrapper table {
+  @apply w-full text-right border-collapse;
+}
+
+.orders-table-wrapper th {
+  @apply bg-gray-50/70 p-3 text-xs font-bold text-gray-500 border-b border-gray-100 whitespace-nowrap;
+}
+
+.orders-table-wrapper td {
+  @apply p-3 text-sm border-b border-gray-50 align-middle whitespace-nowrap;
+}
+
+.orders-table-wrapper tr {
+  @apply transition-colors hover:bg-gray-50/40;
+}
+
+.orders-table-wrapper tr.active-row {
+  @apply bg-emerald-50/40 hover:bg-emerald-50/60;
+}
+
+.customer-cell-name {
+  @apply text-xs font-bold text-gray-800;
+}
+
+.customer-cell-phone {
+  @apply text-[11px] text-gray-400 font-mono mt-0.5;
+}
+
+.order-price-cell {
+  @apply text-xs font-mono text-gray-700;
+}
+
+.empty-table-message {
+  @apply text-center p-6 text-gray-400 text-xs;
+}
+
+.status-badge {
+  @apply text-[11px] font-medium px-2 py-0.5 rounded-full inline-block;
+}
+.status-badge.tag-pending { @apply bg-amber-50 text-amber-700 border border-amber-100; }
+.status-badge.tag-processing { @apply bg-blue-50 text-blue-700 border border-blue-100; }
+.status-badge.tag-shipped { @apply bg-indigo-50 text-indigo-700 border border-indigo-100; }
+.status-badge.tag-delivered { @apply bg-emerald-50 text-emerald-700 border border-emerald-100; }
+.status-badge.tag-cancelled { @apply bg-rose-50 text-rose-700 border border-rose-100; }
+
+.payment-badge {
+  @apply text-[11px] font-medium px-2 py-0.5 rounded-full inline-block;
+}
+.payment-badge.is-paid { @apply bg-green-100 text-green-800; }
+.payment-badge.is-unpaid { @apply bg-gray-100 text-gray-600; }
+
+/* أزرار الإجراءات للجدول */
+.action-btn.view {
+  @apply p-1.5 rounded-lg border text-blue-600 bg-blue-50 border-blue-100 hover:bg-blue-600 hover:text-white transition-all inline-flex items-center justify-center;
+}
+
+.no-order-selected {
+  @apply text-center py-12 text-xs text-gray-400 italic;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .order-details-card, .order-details-card * {
+    visibility: visible;
+  }
+
+  .order-details-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    padding: 20px !important;
+    direction: rtl; 
+  }
+
+  .order-details-card button {
+    display: none !important;
+  }
+}

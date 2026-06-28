@@ -1,0 +1,38 @@
+/* الحاوية الرئيسية */
+.categories-container {
+  @apply w-full bg-white border-b border-gray-100 py-12 mt-20;
+}
+.categories-flex-row {
+  @apply flex items-center justify-center gap-6 overflow-x-auto pb-4 pt-4 px-2;
+  @apply max-sm:justify-start;
+  @apply lg:gap-12; 
+  -webkit-overflow-scrolling: touch;
+}
+.category-circle-btn {
+  @apply flex flex-col items-center gap-3 min-w-[90px] focus:outline-none cursor-pointer border-none bg-transparent;
+}
+
+.circle-design-inactive {
+  @apply w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 border border-[#E7DDCF] bg-[#F5F0E8] text-[#1E4620];
+}
+
+.circle-design-active {
+  @apply w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 border border-[#2a6c2d] bg-[#2a6c2d] text-white shadow-md scale-105;
+}
+
+.category-circle-btn:hover .circle-design-inactive {
+  background-color: #efe7db;
+  border-color: #2a6c2d;
+  transform: translateY(-2px);
+}
+
+.category-circle-btn:hover .category-text-inactive {
+  color: #1a441c;
+}
+
+.categories-flex-row {
+  scrollbar-width: none;
+}
+.categories-flex-row::-webkit-scrollbar {
+  display: none;
+}

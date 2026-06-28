@@ -1,0 +1,55 @@
+.footer-main {
+  @apply w-full bg-[#1a3d1a] text-white pt-20 pb-10 mt-24;
+}
+.footer-grid-container {
+  @apply max-w-[1200px] mx-auto px-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 text-right max-sm:text-center;
+}
+.footer-section-logo {
+  @apply flex flex-col max-sm:items-center;
+}
+
+.logo-wrapper {
+  @apply h-[90px] flex items-center mb-4;
+}
+
+.logo-wrapper img {
+  @apply h-[90px] object-contain;
+}
+
+.footer-description {
+  @apply text-[17px] text-gray-300 leading-relaxed max-w-xs;
+}
+.footer-heading {
+  @apply text-[#8fc45a] text-xl font-semibold mb-5;
+}
+.footer-links-list {
+  @apply flex flex-col gap-3;
+}
+
+.footer-custom-link {
+  @apply text-[17px] text-gray-300 hover:text-white hover:underline transition-colors duration-300 block;
+}
+
+.footer-contact-list {
+  @apply flex flex-col gap-4;
+}
+
+.footer-contact-item {
+  @apply text-[17px] text-gray-300 flex items-center gap-3 justify-start max-sm:justify-center;
+}
+
+.direction-ltr {
+  direction: ltr;
+}
+
+.footer-section-social {
+  @apply flex flex-col max-sm:items-center;
+}
+
+.social-icons-wrapper {
+  @apply flex max-sm:justify-center w-full;
+}
+
+.footer-copyrights {
+  @apply border-t border-white/10 mt-12 pt-6 text-center text-sm text-gray-400;
+}

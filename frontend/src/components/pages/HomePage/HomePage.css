@@ -1,0 +1,7 @@
+.home-page {
+  width: 100%;
+  min-height: 100vh;
+  display: block;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}

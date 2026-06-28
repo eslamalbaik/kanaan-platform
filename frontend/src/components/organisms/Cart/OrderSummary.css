@@ -1,0 +1,9 @@
+.order-summary-sidebar select {
+  transition: border-color 0.2s ease;
+}
+.checkout-btn {
+  transition: all 0.2s ease-in-out;
+}
+.checkout-btn:active {
+  transform: scale(0.98);
+}

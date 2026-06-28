@@ -1,0 +1,108 @@
+
+.product-card {
+  @apply bg-white rounded-2xl border border-[#eeebe4] flex flex-col relative transition-all duration-300 ease-in-out;
+  overflow: hidden !important; 
+  
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.product-card:hover {
+  @apply shadow-lg transform -translate-y-1;
+}
+
+.image-container {
+  @apply w-full overflow-hidden relative bg-white aspect-[4/3] rounded-t-2xl max-sm:rounded-t-xl;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 240px;
+}
+
+.image-container img {
+  @apply w-full h-full transition-transform duration-500 ease-in-out transform;
+  object-fit: cover;
+  object-position: center;
+}
+
+.product-card:hover .image-container img {
+  @apply scale-105;
+}
+
+/* زر المفضلة */
+.favorite-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+  transition: transform 0.18s, box-shadow 0.18s;
+  z-index: 2;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.16);
+}
+
+.fav-filled {
+  color: #e53e3e;
+  transition: all 0.18s;
+}
+
+.fav-empty {
+  color: #aaa;
+  transition: all 0.18s;
+}
+
+.favorite-btn:hover .fav-empty {
+  color: #e53e3e;
+}
+
+.card-content { 
+  @apply p-4 flex flex-col gap-2;
+  @apply max-sm:p-3 max-sm:gap-1.5; 
+}
+
+.card-content h3 {
+  @apply text-base font-bold text-gray-800 leading-tight line-clamp-1;
+  @apply max-sm:text-sm; 
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
+/* سطر السعر */
+.card-price-row {
+  @apply mb-1;
+}
+
+.price { 
+  @apply font-extrabold text-lg text-[#2a6c2d];
+  @apply max-sm:text-base; 
+}
+
+.card-footer-buttons { 
+  @apply grid grid-cols-1 gap-1.5 mt-1.5 w-full;
+  
+  @apply lg:grid-cols-2 lg:gap-2; 
+}
+
+.add-to-cart-btn, .view-product-btn { 
+  @apply flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-sm font-medium w-full transition-colors duration-300 whitespace-nowrap !important;
+  @apply max-sm:text-xs max-sm:py-1.5; 
+}
+.view-product-btn {
+  @apply bg-[#f5f4f0] text-gray-600 border border-[#e1ded7] !important;
+}
+
+.view-product-btn:hover {
+  @apply bg-[#eae8e1] text-gray-800 !important;
+}

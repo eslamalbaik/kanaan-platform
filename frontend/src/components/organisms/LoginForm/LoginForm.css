@@ -1,0 +1,68 @@
+.login-form-inner {
+    @apply flex flex-col items-center w-full max-w-lg mx-auto;
+}
+
+.inputs-group {
+    @apply w-full flex flex-col gap-5 mb-5;
+}
+
+.login-extras {
+    @apply w-full flex justify-end items-center text-white/90 text-sm mb-10;
+}
+
+.remember-checkbox {
+    @apply flex items-center gap-2 cursor-pointer;
+}
+
+.remember-checkbox input {
+    @apply w-4 h-4 accent-white cursor-pointer;
+}
+
+.forgot-link {
+    @apply hover:text-white hover:underline transition-all;
+}
+
+.login-submit-btn {
+    @apply w-full bg-[#1f4d1f] text-white font-bold py-4 rounded-[50px] 
+           hover:bg-opacity-90 transition-all text-xl shadow-lg;
+}
+
+.go-to-signup {
+    @apply text-white/80 mt-6 text-sm text-center;
+}
+
+.go-to-signup a {
+    @apply text-white font-bold hover:underline mr-1;
+}
+
+@media (max-width: 1024px) and (min-width: 641px) {
+  .inputs-group {
+        @apply gap-[18px] mb-6; 
+    }
+    
+    .login-extras {
+        @apply mb-8 text-sm;
+    }
+
+    .login-submit-btn {
+        @apply py-3.5 text-lg rounded-[50px]; 
+    }
+}
+
+@media (max-width: 640px) {
+    .inputs-group {
+        @apply gap-4 mb-4;
+    }
+
+    .login-extras {
+        @apply mb-6 text-xs;
+    }
+
+    .login-submit-btn {
+        @apply py-3 text-base rounded-[50px]; 
+    }
+
+    .go-to-signup {
+        @apply mt-4 text-xs;
+    }
+}
