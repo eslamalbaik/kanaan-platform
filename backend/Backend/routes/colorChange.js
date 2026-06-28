@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const TensorApiClient = require("../services/TensorApiClient");
+const tensorClient = require("../services/TensorApiClient");
 const authMiddleware = require("../middleware/auth");
-
-const client = new TensorApiClient();
 
 const COLOR_NAMES_AR = {
   '#1a1a1a': 'أسود', '#f5f5f5': 'أبيض', '#c8b89a': 'بيج', '#6b7280': 'رمادي',
@@ -33,13 +31,13 @@ router.post("/", authMiddleware, async (req, res) => {
   try {
     let resourceId = null;
     try {
-      resourceId = await client.uploadImage(imageUrl);
+      resourceId = await tensorClient.uploadImage(imageUrl);
     } catch (e) {
       return res.status(500).json({ success: false, message: "فشل رفع الصورة: " + e.message });
     }
 
-    const jobId = await client.createJob(positive, negative, 0.35, 7, resourceId);
-    const resultUrl = await client.pollJob(jobId, 20, 4000);
+    const jobId = await tensorClient.createJob(positive, negative, 0.35, 7, resourceId);
+    const resultUrl = await tensorClient.pollJob(jobId, 20, 4000);
 
     res.json({ success: true, data: { resultUrl, color, colorName } });
   } catch (e) {
