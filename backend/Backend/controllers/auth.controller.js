@@ -32,10 +32,21 @@ const register = async (req, res) => {
     });
     await user.save();
 
+    const token = await user.generateToken();
+    const refreshToken = await user.refreshToken();
+
     res.status(201).json({
       success: true,
       message: "Account created successfully",
-      data: user,
+      data: {
+        userId: user._id,
+        name: user.name,
+        role: user.role,
+        token,
+        refreshToken,
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "15m",
+        refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
+      },
     });
   } catch (err) {
     if (err.name === "ValidationError") {
