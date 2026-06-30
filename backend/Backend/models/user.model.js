@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema(
         "Phone number must be a valid Palestinian number (e.g. +970599123456)",
       ],
       unique: true,
+      sparse: true,
     },
 
     address: {
