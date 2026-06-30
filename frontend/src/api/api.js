@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // إعداد الرابط الأساسي الذي أرسله مطور الباك-إند
 const API = axios.create({
-  baseURL: 'http://31.97.196.73/v1',
+  baseURL: 'http://localhost:3000/v1',
   headers: {
     'Content-Type': 'application/json',
   },

@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import AuthInput from '../../molecules/AuthInput/AuthInput';
 import { validateLogin } from '../../../validations/authValidation';
 import Button from '../../atoms/Button/Button';
-import { Link ,useNavigate} from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../../../context/AuthContext';
 import API from '../../../api/api';
 import './LoginForm.css'
 
 const LoginForm = () => {
-  const { login } = useAuth(); 
-  const navigate = useNavigate(); 
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || '/';
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -44,7 +46,7 @@ const handleSubmit = async (e) => {
 
         login({ id: userId, name, email: formData.email, role, token });
 
-        navigate('/');
+        navigate(from, { replace: true });
       } catch (err) {
         const msg = err.response?.data?.message || "البريد الإلكتروني أو كلمة المرور غير صحيحة";
         setErrors({ server: msg });

@@ -16,14 +16,19 @@ export default function AIAssistantPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
-    API.get('/products')
+    console.log('🔄 جاري تحميل المنتجات للمساعد الذكي (أول 10 فقط)...');
+    API.get('/products', { params: { limit: 10, page: 1 } })
       .then(res => {
+        console.log('✅ تم تحميل المنتجات:', res.data);
         const data = res.data?.data;
         const list = Array.isArray(data) ? data : (data?.products || []);
+        console.log('📦 المنتجات المحملة:', list.length);
         setProducts(list);
         setFiltered(list);
       })
-      .catch(() => {})
+      .catch(err => {
+        console.error('❌ خطأ في تحميل المنتجات:', err.message);
+      })
       .finally(() => setLoading(false));
   }, []);
 

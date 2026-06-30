@@ -112,7 +112,7 @@ export default function ProductDetails() {
 
   const handleAddToCartSubmit = () => {
     if (!product || product.stockQuantity === 0) return;
-    if (!user) { navigate('/login'); return; }
+    if (!user) { navigate('/login', { state: { from: location.pathname } }); return; }
 
     // دمج الـ selectedSize ضمن selectedAttributes إذا وجد
     const finalAttributes = { ...selectedAttributes };

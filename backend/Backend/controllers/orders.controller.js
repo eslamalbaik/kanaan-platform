@@ -29,14 +29,21 @@ const createOrder = asyncHandler(async (req, res) => {
 
   const totals = calculateCartTotals(cart);
 
+  const productIds = totals.items.map((item) => item.product._id);
+  const products = await Product.find({ _id: { $in: productIds } });
+  const productMap = {};
+  products.forEach((p) => {
+    productMap[p._id.toString()] = p;
+  });
+
   for (let item of totals.items) {
     const productItem = item.product;
-    const product = await Product.findOne({ _id: productItem._id });
+    const product = productMap[productItem._id.toString()];
 
-    if (product.stockQuantity < item.quantity) {
+    if (!product || product.stockQuantity < item.quantity) {
       return res.status(409).json({
         success: false,
-        message: `${product.name} out of stock`,
+        message: `${product ? product.name : "Product"} out of stock`,
       });
     }
 
@@ -206,8 +213,13 @@ const downloadInvoice = asyncHandler(async (req, res) => {
   return res.end(Buffer.from(pdfBytes));
 });
 
+let cachedFontBytes = null;
+
 const generateInvoice = async (order) => {
-  const fontBytes = fs.readFileSync("./fonts/Cairo.ttf");
+  if (!cachedFontBytes) {
+    cachedFontBytes = fs.readFileSync("./fonts/Cairo.ttf");
+  }
+  const fontBytes = cachedFontBytes;
 
   const pdfDoc = await PDFDocument.create();
   pdfDoc.registerFontkit(fontkit);

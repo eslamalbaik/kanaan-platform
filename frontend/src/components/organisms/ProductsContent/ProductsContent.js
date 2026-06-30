@@ -30,7 +30,11 @@ const ProductsContent = ({ activeCategory, searchQuery = '', onAddToCart }) => {
         const params = new URLSearchParams();
         if (searchQuery) params.set('search', searchQuery);
         if (activeCategory && activeCategory !== 'all') params.set('category', activeCategory);
+        params.set('limit', '20');
+        params.set('page', '1');
         const productUrl = `/products${params.toString() ? '?' + params.toString() : ''}`;
+        console.log('🔄 جاري جلب:', productUrl);
+
         const [productsRes, categoriesRes] = await Promise.all([
           API.get(productUrl).catch(() => null),
           API.get('/categories').catch(() => null),
@@ -38,13 +42,19 @@ const ProductsContent = ({ activeCategory, searchQuery = '', onAddToCart }) => {
 
         if (productsRes?.data?.data) {
           const p = productsRes.data.data;
-          setLiveProducts(Array.isArray(p) ? p : (p.products || []));
+          const products = Array.isArray(p) ? p : (p.products || p || []);
+          console.log('✅ تم تحميل:', products.length, 'منتج');
+          setLiveProducts(products);
+        } else {
+          console.error('❌ لا توجد بيانات:', productsRes?.data);
+          setLiveProducts([]);
         }
         if (categoriesRes?.data?.data) {
           setCategoriesList(Array.isArray(categoriesRes.data.data) ? categoriesRes.data.data : []);
         }
       } catch (e) {
-        console.error('خطأ في جلب المنتجات:', e);
+        console.error('❌ خطأ:', e.message);
+        setLiveProducts([]);
       } finally {
         setLoadingProducts(false);
       }
@@ -67,36 +77,44 @@ const ProductsContent = ({ activeCategory, searchQuery = '', onAddToCart }) => {
     return found ? found.name : 'قسم مخصص';
   };
 const getFilteredAndSortedProducts = () => {
-    
+    console.log('🔍 تطبيق الفلاتر:', { maxPrice, inStockOnly, selectedExtraFilters });
+    console.log('📦 عدد المنتجات الأصلي:', liveProducts.length);
+
     let result = liveProducts.filter(product => {
       const catId = product.category?._id || product.category;
       const matchCategory = activeCategory === 'all' || catId === activeCategory;
-      
+
       const matchPrice = product.price <= (maxPrice * 100);
       const matchStock = !inStockOnly || (product.stockQuantity && product.stockQuantity > 0);
 
       return matchCategory && matchPrice && matchStock;
     });
 
+    console.log('✅ بعد الفلتر الأساسي:', result.length, 'منتج');
+
     if (selectedExtraFilters && typeof selectedExtraFilters === 'object' && Object.keys(selectedExtraFilters).length > 0) {
-      
+      console.log('🎯 تطبيق فلاتر الخصائص:', selectedExtraFilters);
+
       Object.keys(selectedExtraFilters).forEach((attrName) => {
         const allowedValues = selectedExtraFilters[attrName] || [];
-        
+
         if (Array.isArray(allowedValues) && allowedValues.length > 0) {
+          const beforeFilter = result.length;
           result = result.filter((product) => {
-            
             const productAttrVal = product.attributes?.[attrName];
 
-            if (productAttrVal === undefined || productAttrVal === null) return false;
+            if (productAttrVal === undefined || productAttrVal === null) {
+              console.log(`⚠️ المنتج ${product.name} لا يحتوي على الخاصية ${attrName}`);
+              return false;
+            }
 
             const productValuesArray = Array.isArray(productAttrVal) ? productAttrVal : [productAttrVal];
-
             const normalizedAllowedValues = allowedValues.map(v => v.toString().trim().toLowerCase());
             const normalizedProductValues = productValuesArray.map(v => v.toString().trim().toLowerCase());
 
             return normalizedProductValues.some(val => normalizedAllowedValues.includes(val));
           });
+          console.log(`✅ فلتر ${attrName}: ${beforeFilter} → ${result.length} منتجات`);
         }
       });
     }
@@ -193,13 +211,20 @@ const getFilteredAndSortedProducts = () => {
         </aside>
 
         <main className="grid-and-toolbar-wrapper">
-          <ProductsGrid
-            products={processedProducts}
-            activeCategory={activeCategory}
-            maxPrice={maxPrice}
-            onAddToCart={onAddToCart}
-            viewMode={viewMode}
-          />
+          {loadingProducts ? (
+            <div className="w-full py-12 flex flex-col items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2a6c2d] mb-4"></div>
+              <p className="text-gray-600 font-semibold">جاري تحميل المنتجات...</p>
+            </div>
+          ) : (
+            <ProductsGrid
+              products={processedProducts}
+              activeCategory={activeCategory}
+              maxPrice={maxPrice}
+              onAddToCart={onAddToCart}
+              viewMode={viewMode}
+            />
+          )}
         </main>
       </div>
     </div>

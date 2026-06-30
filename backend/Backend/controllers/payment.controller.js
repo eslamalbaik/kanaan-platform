@@ -32,14 +32,17 @@ const webhook = async (req, res) => {
     order.status = "confirmed";
     await order.save();
 
-    for (let item of order.items) {
-      const product = await Product.findById(item.productId);
-
-      if (product) {
-        product.stockQuantity -= item.quantity;
-        if (product.stockQuantity < 0) product.stockQuantity = 0;
-        await product.save();
+    const productIds = order.items.map(item => item.productId);
+    const bulkOps = order.items.map(item => ({
+      updateOne: {
+        filter: { _id: item.productId },
+        update: {
+          $inc: { stockQuantity: -item.quantity },
+        },
       }
+    }));
+    if (bulkOps.length > 0) {
+      await Product.bulkWrite(bulkOps);
     }
 
     const cart = await Cart.findOne({ user: order.userId });

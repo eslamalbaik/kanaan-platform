@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../../../context/CartContext';
 import { useAuth } from '../../../context/AuthContext';
 import API from '../../../api/api';
@@ -9,6 +9,7 @@ export default function CheckoutPage() {
   const { cartItems, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -43,7 +44,7 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) { navigate('/login'); return; }
+    if (!user) { navigate('/login', { state: { from: location.pathname } }); return; }
     if (cartItems.length === 0) { navigate('/cart'); return; }
 
     setError('');

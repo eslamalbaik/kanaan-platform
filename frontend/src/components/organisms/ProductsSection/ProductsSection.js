@@ -3,6 +3,7 @@ import ProductCard from '../../molecules/ProductCard/ProductCard';
 import Button from '../../atoms/Button/Button';
 import { Package } from "lucide-react";
 import { useCart } from '../../../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 import { getIconComponent } from '../../../utils/iconHelper';
 import API from '../../../api/api';
 import './ProductsSection.css';
@@ -10,22 +11,45 @@ import './ProductsSection.css';
 export default function ProductsSection({ onAddToCart }) {
   const [active, setActive] = useState("all");
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([{ id: "all", label: "الكل", icon: <Package size={20} /> }]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const [productsRes, categoriesRes] = await Promise.all([
-          API.get('/products').catch(() => null),
-          API.get('/categories').catch(() => null),
-        ]);
+        console.log('🔄 جاري تحميل أول 5 منتجات...');
+        const productsRes = await API.get('/products', { params: { limit: 5, page: 1 } });
+        console.log('✅ استجابة المنتجات:', productsRes);
 
         if (productsRes?.data?.data) {
-          const p = productsRes.data.data;
-          setProducts(Array.isArray(p) ? p : (p.products || []));
+          const data = productsRes.data.data;
+          const productsList = Array.isArray(data) ? data : (data.products || data || []);
+          console.log('✅ تم تحميل:', productsList.length, 'منتج');
+
+          if (productsList.length > 0) {
+            setProducts(productsList);
+            setPage(1);
+            setTotalPages(data.pagination?.totalPages || 1);
+          } else {
+            setError('لم يتم العثور على منتجات');
+            setProducts([]);
+          }
+        } else {
+          console.error('❌ لا توجد بيانات منتجات:', productsRes?.data);
+          setError('فشل تحميل المنتجات');
+          setProducts([]);
         }
 
+        // تحميل الفئات
+        const categoriesRes = await API.get('/categories').catch(() => null);
         if (categoriesRes?.data?.data) {
           const cats = Array.isArray(categoriesRes.data.data) ? categoriesRes.data.data : [];
           setCategories([
@@ -37,7 +61,11 @@ export default function ProductsSection({ onAddToCart }) {
           ]);
         }
       } catch (e) {
-        console.error('خطأ في جلب البيانات:', e);
+        console.error('❌ خطأ:', e.message);
+        setError(`خطأ: ${e.message}`);
+        setProducts([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -49,6 +77,26 @@ export default function ProductsSection({ onAddToCart }) {
       onAddToCart(product);
     } else {
       addToCart(product);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (page >= totalPages || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+      const productsRes = await API.get('/products', { params: { limit: 5, page: nextPage } });
+
+      if (productsRes?.data?.data) {
+        const data = productsRes.data.data;
+        const productsList = Array.isArray(data) ? data : (data.products || []);
+        setProducts(prev => [...prev, ...productsList]);
+        setPage(nextPage);
+      }
+    } catch (e) {
+      console.error('خطأ في تحميل المزيد:', e);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -86,7 +134,22 @@ export default function ProductsSection({ onAddToCart }) {
         </nav>
 
         <div className="w-full px-4 max-sm:px-2">
-          {latestEight.length > 0 ? (
+          {loading ? (
+            <div className="w-full py-12 flex flex-col items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2a6c2d] mb-4"></div>
+              <p className="text-gray-600 font-semibold">جاري تحميل المنتجات...</p>
+            </div>
+          ) : error ? (
+            <div className="no-products-message">
+              <p className="text-base font-bold mb-1 text-red-600">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-3 px-4 py-2 bg-[#2a6c2d] text-white rounded-lg text-sm"
+              >
+                إعادة تحميل
+              </button>
+            </div>
+          ) : latestEight.length > 0 ? (
             <div className="products-grid-layout">
               {latestEight.map((item) => (
                 <div key={item._id} className="w-full flex justify-center">
@@ -105,13 +168,29 @@ export default function ProductsSection({ onAddToCart }) {
           )}
         </div>
 
-        {hasMore && (
+        {page < totalPages && (
           <div className="w-full flex justify-center mt-8">
             <button
-              onClick={() => window.location.href = `/products?category=${active}`}
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className={`px-6 py-2.5 border border-[#2d6a2d] text-[#2d6a2d] font-bold rounded-xl transition-all text-sm shadow-sm ${
+                loadingMore
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:bg-[#2d6a2d] hover:text-white'
+              }`}
+            >
+              {loadingMore ? 'جاري التحميل...' : 'تحميل المزيد'}
+            </button>
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="w-full flex justify-center mt-4">
+            <button
+              onClick={() => navigate(`/products?category=${active}`)}
               className="px-6 py-2.5 border border-[#2d6a2d] text-[#2d6a2d] font-bold rounded-xl hover:bg-[#2d6a2d] hover:text-white transition-all text-sm shadow-sm"
             >
-              عرض كافة المنتجات في هذا القسم
+              عرض جميع المنتجات
             </button>
           </div>
         )}

@@ -36,7 +36,18 @@ export const CartProvider = ({ children }) => {
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addToCart = async (product) => {
-    if (!user || user.role === 'admin') return;
+    if (!user) {
+      toast.error('يجب تسجيل الدخول أولاً', {
+        style: { fontFamily: 'inherit', direction: 'rtl' }
+      });
+      return;
+    }
+    if (user.role === 'admin') {
+      toast.error('المسؤولون لا يمكنهم الإضافة للسلة', {
+        style: { fontFamily: 'inherit', direction: 'rtl' }
+      });
+      return;
+    }
     try {
       // selectedAttributes = اختيارات المستخدم فقط (مش كل قيم المنتج)
       const data = await cartService.addToCart(product._id, product.quantity || 1, product.selectedAttributes || null, product.customizationId || null);

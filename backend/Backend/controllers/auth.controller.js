@@ -12,13 +12,14 @@ const register = async (req, res) => {
     const { name, email, phone, password, address } = req.body;
 
     const exists = await User.findOne({
-      email,
+      $or: [{ email }, { phone }],
     });
 
     if (exists) {
+      const field = exists.email === email ? "البريد الإلكتروني" : "رقم الهاتف";
       return res.status(409).json({
         success: false,
-        message: "Account already exists with this email or phone",
+        message: `حساب بهذا ${field} موجود بالفعل`,
         code: 409,
       });
     }
@@ -56,6 +57,18 @@ const register = async (req, res) => {
           message: err.errors.password.message,
         });
       }
+      if (err.errors.phone) {
+        return res.status(422).json({
+          success: false,
+          message: err.errors.phone.message,
+        });
+      }
+      if (err.errors.email) {
+        return res.status(422).json({
+          success: false,
+          message: err.errors.email.message,
+        });
+      }
 
       return res.status(400).json({
         success: false,
@@ -63,9 +76,18 @@ const register = async (req, res) => {
       });
     }
 
+    if (err.code === 11000) {
+      const field = err.keyPattern.email ? "البريد الإلكتروني" : "رقم الهاتف";
+      return res.status(409).json({
+        success: false,
+        message: `حساب بهذا ${field} موجود بالفعل`,
+      });
+    }
+
+    console.error("Register error:", err);
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: err.message || "حدث خطأ في إنشاء الحساب",
     });
   }
 };
@@ -81,7 +103,7 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Invalid email or password",
+        message: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
       });
     }
 
@@ -90,7 +112,7 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password",
+        message: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
       });
     }
 
@@ -112,7 +134,7 @@ const login = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "حدث خطأ في الخادم",
     });
   }
 };
@@ -125,7 +147,7 @@ const logout = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "المستخدم غير موجود",
       });
     }
 
@@ -138,12 +160,12 @@ const logout = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Logged out successfully",
+      message: "تم تسجيل الخروج بنجاح",
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "Server error",
+      message: "حدث خطأ في الخادم",
     });
   }
 };

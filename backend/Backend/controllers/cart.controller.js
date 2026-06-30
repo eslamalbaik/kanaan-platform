@@ -301,12 +301,11 @@ const removeCartItem = asyncHandler(async (req, res) => {
 
   await cart.save();
 
-  await cart.populate("items.product");
-  const discountedCart = await cart.populate(
-    "coupon",
-    "code discountType discountValue",
-  );
-  const totals = calculateCartTotals(discountedCart);
+  await cart.populate([
+    { path: "items.product" },
+    { path: "coupon", select: "code discountType discountValue" }
+  ]);
+  const totals = calculateCartTotals(cart);
 
   res.json({
     success: true,
@@ -375,7 +374,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
 
   coupon.usageCount += 1;
   cart.coupon = coupon._id;
-  cart.populate("coupon");
+  await cart.populate("coupon", "code discountType discountValue");
 
   await coupon.save();
   await cart.save();

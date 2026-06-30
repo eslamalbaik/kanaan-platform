@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Eye, Heart } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../atoms/Button/Button';
 import { useFavorite } from '../../../context/FavoriteContext';
 import { useAuth } from '../../../context/AuthContext';
@@ -8,7 +8,9 @@ import './ProductCard.css';
 
 const ProductCard = ({ product, onAddToCart, onViewProduct }) => {
   const [added, setAdded] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { isFavorite, toggleFavorite } = useFavorite();
   const { user } = useAuth();
 
@@ -16,6 +18,10 @@ const ProductCard = ({ product, onAddToCart, onViewProduct }) => {
   const fav = isFavorite(productId);
 
   const handleAdd = () => {
+    if (!user) {
+      navigate('/login', { state: { from: location.pathname + location.search } });
+      return;
+    }
     onAddToCart(product);
     setAdded(true);
     setTimeout(() => setAdded(false), 1600);
@@ -29,7 +35,7 @@ const ProductCard = ({ product, onAddToCart, onViewProduct }) => {
   const handleFavorite = (e) => {
     e.stopPropagation();
     if (!user || user.role === 'admin') {
-      navigate('/login');
+      navigate('/login', { state: { from: location.pathname + location.search } });
       return;
     }
     toggleFavorite(product);
@@ -38,10 +44,15 @@ const ProductCard = ({ product, onAddToCart, onViewProduct }) => {
   return (
     <article className="product-card" dir="rtl">
       <div className="image-container cursor-pointer" onClick={handleView}>
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+        )}
         <img
-          src={(product.images && product.images.length > 0) ? product.images[0] : "assets/h-st-tray.png"}
+          src={(product.images && product.images.length > 0) ? product.images[0] : "/assets/placeholder.png"}
           alt={product.name}
           loading="lazy"
+          onLoad={() => setImageLoaded(true)}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: imageLoaded ? 1 : 0.5 }}
         />
         {/* زر المفضلة */}
         <button
