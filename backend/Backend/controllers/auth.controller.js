@@ -12,14 +12,13 @@ const register = async (req, res) => {
     const { name, email, phone, password, address } = req.body;
 
     const exists = await User.findOne({
-      $or: [{ email }, { phone }],
+      email,
     });
 
     if (exists) {
-      const field = exists.email === email ? "البريد الإلكتروني" : "رقم الهاتف";
       return res.status(409).json({
         success: false,
-        message: `حساب بهذا ${field} موجود بالفعل`,
+        message: "Account already exists with this email or phone",
         code: 409,
       });
     }
@@ -33,21 +32,10 @@ const register = async (req, res) => {
     });
     await user.save();
 
-    const token = await user.generateToken();
-    const refreshToken = await user.refreshToken();
-
     res.status(201).json({
       success: true,
       message: "Account created successfully",
-      data: {
-        userId: user._id,
-        name: user.name,
-        role: user.role,
-        token,
-        refreshToken,
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || "15m",
-        refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d",
-      },
+      data: user,
     });
   } catch (err) {
     if (err.name === "ValidationError") {
@@ -57,18 +45,6 @@ const register = async (req, res) => {
           message: err.errors.password.message,
         });
       }
-      if (err.errors.phone) {
-        return res.status(422).json({
-          success: false,
-          message: err.errors.phone.message,
-        });
-      }
-      if (err.errors.email) {
-        return res.status(422).json({
-          success: false,
-          message: err.errors.email.message,
-        });
-      }
 
       return res.status(400).json({
         success: false,
@@ -76,18 +52,9 @@ const register = async (req, res) => {
       });
     }
 
-    if (err.code === 11000) {
-      const field = err.keyPattern.email ? "البريد الإلكتروني" : "رقم الهاتف";
-      return res.status(409).json({
-        success: false,
-        message: `حساب بهذا ${field} موجود بالفعل`,
-      });
-    }
-
-    console.error("Register error:", err);
     res.status(500).json({
       success: false,
-      message: err.message || "حدث خطأ في إنشاء الحساب",
+      message: "Server error",
     });
   }
 };
@@ -103,7 +70,7 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        message: "Invalid email or password",
       });
     }
 
@@ -112,7 +79,7 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        message: "Invalid email or password",
       });
     }
 
@@ -134,7 +101,7 @@ const login = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "حدث خطأ في الخادم",
+      message: "Server error",
     });
   }
 };
@@ -147,7 +114,7 @@ const logout = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "المستخدم غير موجود",
+        message: "User not found",
       });
     }
 
@@ -160,12 +127,12 @@ const logout = async (req, res) => {
 
     res.json({
       success: true,
-      message: "تم تسجيل الخروج بنجاح",
+      message: "Logged out successfully",
     });
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "حدث خطأ في الخادم",
+      message: "Server error",
     });
   }
 };

@@ -3,8 +3,6 @@ const {
   getProducts,
   getFeaturedProducts,
   getProductById,
-  getProductImages,
-  getProductsDebug,
 } = require("../controllers/products.controller.js");
 
 const {
@@ -34,9 +32,7 @@ router.get(
   ]),
   getProducts,
 );
-router.get("/debug", getProductsDebug);
 router.get("/featured", getFeaturedProducts);
-router.get("/:id/images", validateObjectId("id"), getProductImages);
 router.get("/:id", validateObjectId("id"), getProductById);
 
 // Review Route

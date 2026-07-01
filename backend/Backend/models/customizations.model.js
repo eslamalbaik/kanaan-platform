@@ -57,8 +57,4 @@ customizationSchema.index(
   { expireAfterSeconds: 0 }
 );
 
-customizationSchema.index({ userId: 1, createdAt: -1 });
-customizationSchema.index({ productId: 1 });
-customizationSchema.index({ userId: 1, productId: 1 });
-
 module.exports = mongoose.model("Customization", customizationSchema);

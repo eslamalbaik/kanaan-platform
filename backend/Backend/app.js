@@ -14,8 +14,7 @@ const paymentRoutes = require("./routes/payment.js");
 app.use("/v1/payments", paymentRoutes);
 
 require("./db/mongoose");
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json());
 
 const authRoutes = require("./routes/auth.js");
 app.use("/v1/auth", authRoutes);
@@ -70,9 +69,6 @@ app.use("/v1/admin/dashboard", adminDashboardRoutes);
 
 const adminNotificationRoutes = require("./routes/admin/notifications.js");
 app.use("/v1/admin/notifications", adminNotificationRoutes);
-
-const colorChangeRoutes = require("./routes/colorChange.js");
-app.use("/v1/color-change", colorChangeRoutes);
 
 const notFound = require("./middleware/notFound.js");
 const errorHandler = require("./middleware/errorHandler.js");
