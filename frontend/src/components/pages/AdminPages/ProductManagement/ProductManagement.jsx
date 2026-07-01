@@ -6,6 +6,7 @@ import ProductForm from "../../../organisms/ProductForm/ProductForm";
 import ProductList from "../../../organisms/ProductList/ProductList";
 import { productService } from "../../../../api/productService";
 import { categoryService } from "../../../../api/categoryService";
+import API from "../../../../api/api";
 
 export default function ProductManagement() {
   const [products, setProducts] = useState([]);
@@ -35,6 +36,7 @@ export default function ProductManagement() {
   });
 
   const [imagePreview, setImagePreview] = useState("");
+  const [imageFile, setImageFile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); 
@@ -108,21 +110,25 @@ export default function ProductManagement() {
     });
   };
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      try {
-        const base64 = await convertToBase64(file);
-        setImagePreview(base64); 
-      } catch (error) {
-        console.error("خطأ في معالجة الصورة:", error);
+      setImageFile(file);
+      if (imagePreview && imagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreview);
       }
+      const objectUrl = URL.createObjectURL(file);
+      setImagePreview(objectUrl);
     }
   };
 
   const handleRemoveImage = (e) => {
     e.stopPropagation(); 
+    if (imagePreview && imagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImagePreview("");
+    setImageFile(null);
     const fileInput = document.getElementById("product-image-input");
     if (fileInput) fileInput.value = ""; 
   };
@@ -163,7 +169,7 @@ export default function ProductManagement() {
       slug: product.slug || "",
       price: (product.price / 100).toString(), 
       stockQuantity: product.stockQuantity.toString(),
-      categoryId: product.category?._id || "",
+      categoryId: product.category?._id || (typeof product.category === "string" ? product.category : ""),
       description: product.description || "",
       isCustomizable: product.isCustomizable || false,
     });
@@ -184,7 +190,11 @@ export default function ProductManagement() {
     });
     setProductAttributes({});
     setArrayInputs({});
+    if (imagePreview && imagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImagePreview("");
+    setImageFile(null);
     setIsEditing(false);
     setEditProductId(null);
     setErrors({ name: false, price: false, stockQuantity: false, description: false, dynamicFields: {} });
@@ -257,6 +267,28 @@ export default function ProductManagement() {
     if (!finalSlug) finalSlug = generateProductSlug(formData.name);
 
     try {
+      let finalImageUrl = imagePreview;
+
+      // If there's a new file selected, upload it first
+      if (imageFile) {
+        toast.loading("جاري رفع الصورة للسيرفر...", { id: "upload-toast" });
+        const uploadData = new FormData();
+        uploadData.append("image", imageFile);
+        
+        const uploadRes = await API.post("/upload", uploadData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        
+        toast.dismiss("upload-toast");
+        if (uploadRes.data?.success) {
+          finalImageUrl = uploadRes.data.url;
+        } else {
+          throw new Error("Failed to upload image");
+        }
+      }
+
       if (isEditing) {
         const payload = {
           name: formData.name,
@@ -267,7 +299,7 @@ export default function ProductManagement() {
           category: { _id: formData.categoryId, name: chosenCategoryName },
           attributes: productAttributes,
           isCustomizable: formData.isCustomizable,
-          images: imagePreview ? [imagePreview] : products.find(p => p._id === editProductId)?.images,
+          images: finalImageUrl ? [finalImageUrl] : products.find(p => p._id === editProductId)?.images,
         };
         const updatedList = await productService.updateProduct(editProductId, payload, products);
         setProducts(updatedList);
@@ -282,7 +314,7 @@ export default function ProductManagement() {
           category: { _id: formData.categoryId, name: chosenCategoryName },
           attributes: productAttributes,
           isCustomizable: formData.isCustomizable,
-          images: imagePreview ? [imagePreview] : ["assets/h-st-tray.png"],
+          images: finalImageUrl ? [finalImageUrl] : ["assets/h-st-tray.png"],
         };
         const result = await productService.addProduct(payload, products);
         setProducts(result.updatedList);
@@ -290,8 +322,9 @@ export default function ProductManagement() {
       }
       resetForm();
     } catch (error) {
+      toast.dismiss("upload-toast");
       console.error("Error saving product:", error);
-      toast.error("حدث خطأ أثناء حفظ المنتج", { position: 'top-center' });
+      toast.error(error.message === "Failed to upload image" ? "فشل رفع الصورة للسيرفر" : "حدث خطأ أثناء حفظ المنتج", { position: 'top-center' });
     }
   };
 

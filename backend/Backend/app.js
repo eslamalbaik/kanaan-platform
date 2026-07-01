@@ -3,7 +3,10 @@ dotenv.config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const app = express();
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(cors({
   origin: "http://localhost:3001",
@@ -14,7 +17,8 @@ const paymentRoutes = require("./routes/payment.js");
 app.use("/v1/payments", paymentRoutes);
 
 require("./db/mongoose");
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 const authRoutes = require("./routes/auth.js");
 app.use("/v1/auth", authRoutes);
@@ -69,6 +73,9 @@ app.use("/v1/admin/dashboard", adminDashboardRoutes);
 
 const adminNotificationRoutes = require("./routes/admin/notifications.js");
 app.use("/v1/admin/notifications", adminNotificationRoutes);
+
+const uploadRoutes = require("./routes/upload.js");
+app.use("/v1/upload", uploadRoutes);
 
 const notFound = require("./middleware/notFound.js");
 const errorHandler = require("./middleware/errorHandler.js");

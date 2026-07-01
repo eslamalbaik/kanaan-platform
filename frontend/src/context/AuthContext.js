@@ -30,6 +30,10 @@ const [isLoggedIn, setIsLoggedIn] = useState(() => {
     setUser(null);
     setIsLoggedIn(false);
     localStorage.removeItem("kanaan_user");
+    localStorage.removeItem("kanaan_token");
+    localStorage.removeItem("kanaan_refresh_token");
+    localStorage.removeItem("kanaan_admin_token");
+    localStorage.removeItem("kanaan_admin_refresh_token");
   };
 
   return (
